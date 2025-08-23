@@ -7,7 +7,7 @@ This repository explores **Bayesian Optimization (BO)** for **Neural Architectur
 - **Gaussian Process (GP)**
 - **Random Forest (RF)**
 - **Multi-Layer Perceptron (MLP)**
-- **Graph Neural Network (GNN)** (optional / experimental)
+- **Graph Neural Network (GNN)**
 
 The goal is to evaluate trade-offs between **accuracy, scalability, and sample efficiency** of these surrogate models when used inside a BO-driven NAS pipeline.
 
@@ -15,7 +15,7 @@ The goal is to evaluate trade-offs between **accuracy, scalability, and sample e
 Traditional NAS methods are computationally expensive. Surrogate-assisted Bayesian Optimization provides a more **efficient search strategy**, but performance depends heavily on the choice of surrogate.  
 This project investigates:
 - Which surrogate models perform best across different benchmarks (NASBench-201, possibly NASBench-301/DARTS).  
-- The trade-offs between **expressivity vs computational overhead**.  
+- The trade-offs between **expressivity vs computational overhead**. We will try to compare compute hours and accuracy
 - Metrics like **rank correlation, regret, and trajectory visualizations**.
 
 ## ⚙️ Methodology
