@@ -1,33 +1,57 @@
-# Neural-Architecture-Search-Project
+![Bayesian Neural Architecture Search banner](assets/banner.svg)
 
-# Bayesian Optimization for Neural Architecture Search with Different Surrogate Models
+# Bayesian Neural Architecture Search
 
-## 📌 Project Overview
-This repository explores **Bayesian Optimization (BO)** for **Neural Architecture Search (NAS)**, comparing multiple surrogate models:
-- **Gaussian Process (GP)**
-- **Random Forest (RF)**
-- **Multi-Layer Perceptron (MLP)**
-- **Graph Neural Network (GNN)**
+This project evaluates Bayesian optimization for neural architecture search on NASBench-201. It compares surrogate models with different assumptions about smoothness, structure, and sample efficiency.
 
-The goal is to evaluate trade-offs between **accuracy, scalability, and sample efficiency** of these surrogate models when used inside a BO-driven NAS pipeline.
+## Research question
 
-## 🏗️ Motivation
-Traditional NAS methods are computationally expensive. Surrogate-assisted Bayesian Optimization provides a more **efficient search strategy**, but performance depends heavily on the choice of surrogate.  
-This project investigates:
-- Which surrogate models perform best across different benchmarks (NASBench-201, possibly NASBench-301/DARTS).  
-- The trade-offs between **expressivity vs computational overhead**. We will try to compare compute hours and accuracy
-- Metrics like **rank correlation, regret, and trajectory visualizations**.
+How does surrogate choice affect optimization quality when architecture evaluations are expensive?
 
-## ⚙️ Methodology
-1. Implement a baseline BO-NAS pipeline.  
-2. Swap surrogate models (GP, RF, MLP, GNN).  
-3. Evaluate across benchmarks.  
-4. Compare optimization efficiency and architecture quality.  
+The search pipeline supports:
 
-## 📊 Expected Contributions
-- **Empirical comparison** of surrogate models in BO-NAS.  
-- **Insights** into scalability of GNN surrogates.  
-- **Benchmark results** across datasets.  
-- **Reproducibility**: clean, modular implementation.
+- Gaussian process surrogates
+- Random forest surrogates
+- Multilayer perceptron surrogates
+- Graph neural network surrogates
+- Static and changing benchmark regimes
 
+The evaluation focuses on regret, rank correlation, search trajectories, and computational cost.
 
+## Method
+
+Architectures are encoded from the NASBench-201 topology space. A surrogate predicts validation performance, an acquisition rule selects the next candidate, and the observed result updates the model. The dynamic environment can switch between CIFAR-10, CIFAR-100, and ImageNet16-120 while reusing one benchmark API instance.
+
+## Setup
+
+```bash
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements_NAS.txt
+```
+
+Place the NATS-Bench topology archive in the repository root, then run:
+
+```bash
+python main.py
+```
+
+## Repository layout
+
+```text
+BO.py                    Bayesian optimization loop
+dynamic_env.py           Non-stationary benchmark wrapper
+encoder.py               Architecture encodings
+nasbench201_space.py     NASBench-201 adapter
+surrogates/              Surrogate model implementations
+config.py                Experiment configuration
+tests.py                 Core checks
+```
+
+## Reproducibility
+
+Experiment seeds are centralized in `seed.py`. The benchmark archive is intentionally excluded from Git because of its size and upstream distribution terms.
+
+## Scope
+
+This is an empirical research implementation, not a claim that one surrogate is universally best across search spaces or compute budgets.
