@@ -24,7 +24,7 @@ class NASBench201Space(SearchSpaceBase):
             raise ImportError("Install: pip install nats-bench")
         
         # Load API (fast_mode=True loads the pre-computed index)
-        self.api = create(api_path, 'tss', fast_mode=True, verbose=False)
+        self.api = create(api_path, 'tss', fast_mode=False, verbose=False)
         self.dataset = dataset
         self.use_12epoch = use_12epoch
         self.encoder = OneHotEdgeOpEncoder(self.EDGES, self.OPS)
