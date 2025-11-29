@@ -6,7 +6,7 @@ from BO import BONAS
 def main():
     parser = argparse.ArgumentParser(description='BO-NAS on NAS-Bench-201')
     parser.add_argument('--api-path', type=str, required=True,
-                       help='Path to NATS-Bench-tss-v1_0-3ffb9.pickle.pbz2')
+                       help='Path to NATS-Bench benchmark')
     parser.add_argument('--dataset', type=str, default='cifar10',
                        choices=['cifar10', 'cifar100', 'ImageNet16-120'],
                        help='Dataset to use')
@@ -18,6 +18,9 @@ def main():
                        help='Use 12-epoch results (faster)')
     parser.add_argument('--acquisition', type=str, default='ei',
                        choices=['ei', 'ucb'], help='Acquisition function')
+    parser.add_argument('--surrogate', type=str, default='mlp',
+                       choices=['mlp', 'cnn', 'resnet', 'gbm', 'rf', 'gp', 'attention'],
+                       help='Surrogate model to use')
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--output', type=str, default='results.csv')
     
@@ -49,19 +52,21 @@ def main():
     print(f"Input dimension: {cfg.input_dim}")
     print(f"Max evaluations: {cfg.max_evals}")
     print(f"Acquisition: {cfg.acquisition}")
+    print(f"Surrogate model: {args.surrogate.upper()}")
     
     # Run BO
     print(f"\n{'='*60}")
     print("Running Bayesian Optimization...")
     print(f"{'='*60}\n")
     
-    algo = BONAS(ss, cfg)
+    algo = BONAS(ss, cfg, surrogate_name=args.surrogate)
     results = algo.run()
     
     # Results
     print(f"\n{'='*60}")
     print("RESULTS")
     print(f"{'='*60}")
+    print(f"Surrogate model: {results['surrogate_model'].upper()}")
     print(f"Total evaluations: {results['n_evals']}")
     print(f"Best accuracy    : {results['best_y']:.4f}%")
     print(f"Best arch index  : {results['best_idx']}")
