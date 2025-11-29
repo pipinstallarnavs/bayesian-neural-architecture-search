@@ -1,13 +1,15 @@
 # bo_loop.py
 import numpy as np
 from typing import Dict, Any, List, Tuple, Callable
-from surrogate_mlp import MLPEnsemble
+from surrogates import get_surrogate_model
 from tests import expected_improvement, ucb
 
+
 class BONAS:
-    def __init__(self, search_space, config):
+    def __init__(self, search_space, config, surrogate_name='mlp'):
         self.ss = search_space
         self.cfg = config
+        self.surrogate_name = surrogate_name
         self.X_train = []  # encoded vectors
         self.y_train = []
         self.hist = []     # (iter, best_y, arch_idx)
@@ -15,7 +17,10 @@ class BONAS:
         self.seen_mask = np.zeros(len(self.pool), dtype=bool)
 
         input_dim = self.ss.input_dim if hasattr(self.ss, "input_dim") else self.cfg.input_dim
-        self.model = MLPEnsemble(
+        
+        # Create surrogate model
+        self.model = get_surrogate_model(
+            surrogate_name,
             input_dim=input_dim,
             hidden_sizes=self.cfg.hidden_sizes,
             dropout=self.cfg.dropout,
@@ -97,6 +102,6 @@ class BONAS:
             "best_y": float(self.y_train.max()),
             "best_idx": int(np.argmax(self.y_train)),
             "history": self.hist,
-            "n_evals": int(self.seen_mask.sum())
+            "n_evals": int(self.seen_mask.sum()),
+            "surrogate_model": self.surrogate_name,
         }
-
