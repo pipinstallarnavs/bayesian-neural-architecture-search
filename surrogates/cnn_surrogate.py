@@ -33,7 +33,8 @@ class CNNRegressor(nn.Module):
         self.fc = nn.Linear(hidden_dim*2, 1)
 
     def forward(self, x):
-        x = x.unsqueeze(1) # [B, 1, D]
+        # x starts as [Batch, Input_Dim]
+        x = x.unsqueeze(1) # [Batch, 1, Input_Dim] (Channels=1, Length=Input_Dim)
         x = self.start_conv(x)
         x = self.layer1(x)
         x = self.layer2(x)
@@ -61,6 +62,7 @@ class CNNEnsemble(SurrogateModel):
         y_t = torch.tensor(y_n, dtype=torch.float32, device=self.device)
         ds = torch.utils.data.TensorDataset(X_t, y_t)
         dl = torch.utils.data.DataLoader(ds, batch_size=batch_size, shuffle=True)
+        
         for ep in range(epochs):
             for m, opt in zip(self.members, self.optims):
                 m.train()
@@ -79,5 +81,9 @@ class CNNEnsemble(SurrogateModel):
             for m in self.members:
                 m.eval()
                 preds.append(m(X_t).cpu().numpy())
-        preds = np.stack(preds, axis=0)
-        return preds.mean(axis=0) * self.y_std + self.y_mean, preds.std(axis=0) * self.y_std + 1e-8
+        preds = np.stack(preds, axis=0) # [Ensemble, N]
+        
+        # De-normalize
+        mu = preds.mean(axis=0) * self.y_std + self.y_mean
+        std = preds.std(axis=0) * self.y_std + 1e-8
+        return mu, std

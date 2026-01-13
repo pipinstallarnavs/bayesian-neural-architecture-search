@@ -6,7 +6,7 @@ from .gbm_surrogate import GradientBoostingSurrogate
 from .rf_surrogate import RandomForestSurrogate
 from .gp_surrogate import GaussianProcessSurrogate
 from .attention_surrogate import AttentionEnsemble
-from .gnn_surrogate import GNNEnsemble  # <--- NEW
+from .gnn_surrogate import GNNEnsemble
 
 SURROGATE_MODELS = {
     'mlp': MLPEnsemble,
@@ -16,7 +16,7 @@ SURROGATE_MODELS = {
     'rf': RandomForestSurrogate,
     'gp': GaussianProcessSurrogate,
     'attention': AttentionEnsemble,
-    'gnn': GNNEnsemble,  # <--- NEW
+    'gnn': GNNEnsemble,
 }
 
 def get_surrogate_model(name: str, **kwargs):
