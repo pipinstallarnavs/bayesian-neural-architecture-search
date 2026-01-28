@@ -1,2 +1,4 @@
-venv
+venv/
 NATS-tss-v1_0-3ffb9.pickle.pbz2
+__pycache__/
+*.pyc
