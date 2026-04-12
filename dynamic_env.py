@@ -2,33 +2,29 @@ from nasbench201_space import NASBench201Space
 
 class DynamicNASBenchmark:
     """
-    Simulates non-stationary environment.
-    Regime 0: CIFAR-10
-    Regime 1: CIFAR-100
-    Regime 2: ImageNet16-120
+    Optimized: Loads the API only once and switches the query dataset key.
     """
     def __init__(self, api_path, switch_every=50):
         self.switch_every = switch_every
         self.datasets = ['cifar10', 'cifar100', 'ImageNet16-120']
-        # Load all datasets
-        self.spaces = {
-            d: NASBench201Space(api_path, dataset=d) for d in self.datasets
-        }
+        
+        print(f"Loading NATS-Bench API from {api_path}...")
+        # Initialize ONE space object. This triggers the heavy load once.
+        self.master_space = NASBench201Space(api_path, dataset='cifar10')
+        
         self.current_step = 0
         self.current_regime = 0
-        # Pool is identical across datasets in NAS-Bench-201
-        self.pool = self.spaces['cifar10'].enumerate()
-        # Proxy for encoding methods
-        self.OPS = self.spaces['cifar10'].OPS
+        self.pool = self.master_space.enumerate()
+        self.OPS = self.master_space.OPS
         
     def enumerate(self):
         return self.pool
 
     def encode(self, arch):
-        return self.spaces['cifar10'].encode(arch)
+        return self.master_space.encode(arch)
         
     def encode_graph(self, arch):
-        return self.spaces['cifar10'].encode_graph(arch)
+        return self.master_space.encode_graph(arch)
 
     def evaluate(self, arch):
         # Determine regime
@@ -39,6 +35,10 @@ class DynamicNASBenchmark:
             print(f"\n[!!!] MARKET SHIFT: Switching to {dataset} [!!!]\n")
             self.current_regime = regime_idx
             
-        y = self.spaces[dataset].evaluate(arch)
+        # HACK: Manually swap the dataset string in the master space
+        self.master_space.dataset = dataset
+        
+        # Now evaluate using that dataset
+        y = self.master_space.evaluate(arch)
         self.current_step += 1
         return y
